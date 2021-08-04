@@ -1,2 +1,2 @@
 # clisp
-A basic Lisp implementation written in C.
+A basic Lisp implementation written in C. In progress..
