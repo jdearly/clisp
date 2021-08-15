@@ -75,43 +75,6 @@ void lenv_del(lenv* e) {
 lval* lval_copy(lval* v);
 lval* lval_err(char* m);
 
-lval* lenv_get(lenv* e, lval* k) {
-    for (int i = 0; i < e->count; i++) {
-        // check if the stored string matches the symbol string
-        // if it does, return a copy of the value
-        if (strcmp(e->syms[i], k->sym) == 0) {
-            return lval_copy(e->vals[i]);
-        }
-    }
-
-    // if no symbol found return error
-    return lval_err("unbound symbol!");
-}
-
-void lenv_put(lenv* e, lval* k, lval* v) {
-    // iterate over all items in environment
-    // this is to see if variable already exists
-    for (int i = 0; i < e->count; i++) {
-        // if variable is found delete item at that position
-        // and replace with variable supplied by user
-        if (strcmp(e->syms[i], k->sym) == 0) {
-            lval_del(e->vals[i]);
-            e->vals[i] = lval_copy(v);
-            return;
-        }
-    }
-
-    // if no existing entry found allocate space for new entry
-    e->count++;
-    e->vals = realloc(e->vals, sizeof(lval*) * e->count);
-    e->syms = realloc(e->syms, sizeof(char*) * e->count);
-
-    // copy contents of lval and symbol string into new location
-    e->vals[e->count-1] = lval_copy(v);
-    e->syms[e->count-1] = malloc(strlen(k->sym)+1);
-    strcpy(e->syms[e->count-1], k->sym);
-}
-
 lval* lval_fun(lbuiltin func) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_FUN;
@@ -278,6 +241,97 @@ lval* lval_copy(lval* v) {
 void lval_println(lval* v) { lval_print(v); putchar('\n'); }
 
 lval* lval_eval(lenv* e, lval* v);
+
+lval* lenv_get(lenv* e, lval* k) {
+    // iterate over all items in environment
+    for (int i = 0; i < e->count; i++) {
+        // check if the stored string matches the symbol string
+        // if it does, return a copy of the value
+        if (strcmp(e->syms[i], k->sym) == 0) {
+            return lval_copy(e->vals[i]);
+        }
+    }
+    // if no symbol found return error
+    return lval_err("unbound symbol!");
+}
+
+void lenv_put(lenv* e, lval* k, lval* v) {
+    // iterate over all items in environment
+    // This is to see if variable already exists
+    for (int i = 0; i < e->count; i++) {
+        // if variable is found delete item at that position
+        // and replace with variable supplied by user
+        if (strcmp(e->syms[i], k->sym) == 0) {
+            lval_del(e->vals[i]);
+            e->vals[i] = lval_copy(v);
+            return;
+        }
+    }
+
+    // if no existing entry found allocate space for new entry
+    e->count++;
+    e->vals = realloc(e->vals, sizeof(lval*) * e->count);
+    e->syms = realloc(e->syms, sizeof(char*) * e->count);
+
+    // copy contents of lval and symbol string into new location
+    e->vals[e->count-1] = lval_copy(v);
+    e->syms[e->count-1] = malloc(strlen(k->sym)+1);
+    strcpy(e->syms[e->count-1], k->sym);
+}
+
+
+// copy contents of lval and symbol string into new location
+e->vals[e->count-1] = lval_copy(v);
+e->syms[e->count-1] = malloc(strlen(k->sym)+1);
+strcpy(e->syms[e->count-1], k->sym);
+}
+
+
+// copy contents of lval and symbol string into new location
+e->vals[e->count-1] = lval_copy(v);
+e->syms[e->count-1] = malloc(strlen(k->sym)+1);
+strcpy(e->syms[e->count-1], k->sym);
+}
+
+lval* builtin_add(lenv* e, lval* a) {
+  return builtin_op(e, a, "+");
+}
+
+lval* builtin_sub(lenv* e, lval* a) {
+  return builtin_op(e, a, "-");
+}
+
+lval* builtin_mul(lenv* e, lval* a) {
+  return builtin_op(e, a, "*");
+}
+
+lval* builtin_div(lenv* e, lval* a) {
+  return builtin_op(e, a, "/");
+}
+
+
+void lenv_add_builtin(lenv* e, char* name, lbuiltin func) {
+  lval* k = lval_sym(name);
+  lval* v = lval_fun(func);
+  lenv_put(e, k, v);
+  lval_del(k); lval_del(v);
+}
+
+void lenv_add_builtins(lenv* e) {
+
+  // list functions
+  lenv_add_builtin(e, "list", builtin_list);
+  lenv_add_builtin(e, "head", builtin_head);
+  lenv_add_builtin(e, "tail", builtin_tail);
+  lenv_add_builtin(e, "eval", builtin_eval);
+  lenv_add_builtin(e, "join", builtin_join);
+
+  // mathematical functions
+  lenv_add_builtin(e, "+", builtin_add);
+  lenv_add_builtin(e, "-", builtin_sub);
+  lenv_add_builtin(e, "*", builtin_mul);
+  lenv_add_builtin(e, "/", builtin_div);
+}
 
 lval* builtin_op(lenv* e, lval* a, char* op) {
     // ensure all arguments are numbers
@@ -518,6 +572,9 @@ int main(int argc, char** argv) {
     // Version and Exit information 
     puts("clisp Version 0");
     puts("Press Ctrl+c to Exit\n");
+
+    lenv* e = lenv_new();
+    lenv_add_builtins(e);
 
     // infinite loop
     while(1) {
