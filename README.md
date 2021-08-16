@@ -1,11 +1,24 @@
 A basic Lisp implementation written in C. WIP.
 
-# Running
+# Usage 
 ```
-cc --std=c99 -Wall -g q_expressions.c mpc.c -ledit -lm -o q_expressions
+cc --std=c99 -Wall -g variables.c mpc.c -ledit -lm -o variables 
 ```
 ```
-./q_expressions
+./variables
 ```
-
+# Examples
+```
+lispy> +
+<function>
+lispy> eval (head {5 10 11 15})
+5
+lispy> eval (head {+ - + - * /})
+<function>
+lispy> (eval (head {+ - + - * /})) 10 20
+30
+lispy> hello
+Error: unbound symbol!
+lispy>
+```
 
