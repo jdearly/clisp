@@ -292,7 +292,7 @@ lval* lenv_get(lenv* e, lval* k) {
         }
     }
     // if no symbol found return error
-    return lval_err("unbound symbol!");
+    return lval_err("unbound symbol '%s'", k->sym);
 }
 
 void lenv_put(lenv* e, lval* k, lval* v) {
@@ -319,15 +319,37 @@ void lenv_put(lenv* e, lval* k, lval* v) {
     strcpy(e->syms[e->count-1], k->sym);
 }
 
+lval* builtin_def(lenv* e, lval* a) {
+    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
+    "Function 'def' passed incorrect type!");
 
+    // First argument is symbol list
+    lval* syms = a->cell[0];
+
+    // ensure all elements of first list are symbols
+    for (int i = 0; i < syms->count; i++) {
+        LASSERT(a, syms->cell[i]->type == LVAL_SYM,
+                "Function 'def' cannot define non-symbol");
+    }
+
+    // check correct number of symbols and values
+    LASSERT(a, syms->count == a->count-1,
+            "Function 'def' cannot define incorrect "
+            "number of values to symbols");
+
+    // assign copies of values to symbols
+    for (int i = 0; i < syms->count; i++) {
+        lenv_put(e, syms->cell[i], a->cell[i+1]);
+    }
+
+    lval_del(a);
+    return lval_sexpr();
+}
 
 lval* builtin_op(lenv* e, lval* a, char* op) {
-    // ensure all arguments are numbers
+    
     for (int i = 0; i < a->count; i++) {
-        if (a->cell[i]->type != LVAL_NUM) {
-            lval_del(a);
-            return lval_err("Cannot operate on non-number!");
-        }
+        LASSERT_TYPE(op, a, i, LVAL_NUM);
     }
 
     // pop the first element
@@ -379,7 +401,7 @@ lval* builtin_div(lenv* e, lval* a) {
 
 lval* builtin_head(lenv* e, lval* a) {
     LASSERT(a, a->count == 1,
-            "Function 'head' passed too many arguments!");
+            "Function 'head' passed too many arguments. ");
 
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
             "Function 'head' passed incorrect type!");
@@ -471,6 +493,8 @@ void lenv_add_builtin(lenv* e, char* name, lbuiltin func) {
 }
 
 void lenv_add_builtins(lenv* e) {
+  // variable functions
+  lenv_add_builtin(e, "def", builtin_def);
 
   // list functions
   lenv_add_builtin(e, "list", builtin_list);
