@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mpc.h"
+#include "lispy.h"
 
 #ifdef _WIN32
 #include <string.h>
@@ -45,26 +46,8 @@ struct lenv;
 typedef struct lval lval;
 typedef struct lenv lenv;
 
-enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR, LVAL_FUN };
 
 typedef lval*(*lbuiltin)(lenv*, lval*);
-
-struct lenv {
-    int count;
-    char** syms;
-    lval** vals;
-};
-typedef struct lval {
-    int type;
-    long num;
-    // error and symbol types have some string data
-    char* err;
-    char* sym;
-    lbuiltin fun;
-    // count and pointer to a list of "lval*"
-    int count;
-    struct lval** cell; 
-} lval;
 
 lenv* lenv_new(void) {
     lenv* e = malloc(sizeof(lenv));
@@ -85,9 +68,6 @@ void lenv_del(lenv* e) {
     free(e->vals);
     free(e);
 }
-
-lval* lval_copy(lval* v);
-lval* lval_err(char* fmt, ...);
 
 lval* lval_fun(lbuiltin func) {
     lval* v = malloc(sizeof(lval));
@@ -204,8 +184,6 @@ lval* lval_take(lval* v, int i) {
     return x;
 }
 
-void lval_print(lval* v);
-
 void lval_expr_print(lval* v, char open, char close) {
     putchar(open);
     for (int i = 0; i < v->count; i++) {
@@ -279,8 +257,6 @@ char* ltype_name(int t) {
     default: return "Unknown";
   }
 }
-
-lval* lval_eval(lenv* e, lval* v);
 
 lval* lenv_get(lenv* e, lval* k) {
     // iterate over all items in environment
