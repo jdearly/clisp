@@ -21,12 +21,19 @@ struct lenv {
 
 typedef struct lval {
     int type;
+
+    // basic
     long num;
-    // error and symbol types have some string data
     char* err;
     char* sym;
-    lbuiltin fun;
-    // count and pointer to a list of "lval*"
+
+    // function
+    lbuiltin builtin;
+    lenv* env;
+    lval* formals;
+    lval* body;
+
+    // expression
     int count;
     struct lval** cell; 
 } lval;

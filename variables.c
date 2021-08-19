@@ -72,7 +72,7 @@ void lenv_del(lenv* e) {
 lval* lval_fun(lbuiltin func) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_FUN;
-    v->fun = func;
+    v->builtin = func;
     return v;
 }
 
@@ -219,7 +219,7 @@ lval* lval_copy(lval* v) {
 
     switch (v->type) {
 
-        case LVAL_FUN: x->fun = v->fun; break;
+        case LVAL_FUN: x->builtin = v->builtin; break;
         case LVAL_NUM: x->num = v->num; break;
 
         // copy stirngs using mallow and strcpy
@@ -527,7 +527,7 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
     }
 
     // call builtin with operator
-    lval* result = f->fun(e, v);
+    lval* result = f->builtin(e, v);
     lval_del(f);
     return result;
 }
