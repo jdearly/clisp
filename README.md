@@ -2,7 +2,7 @@ A basic Lisp implementation written in C. WIP.
 
 # Usage 
 ```
-cc --std=c99 -Wall -g variables.c mpc.c -ledit -lm -o variables 
+cc --std=c99 -Wall -g functions.c mpc.c -ledit -lm -o lispy 
 ```
 ```
 ./variables
