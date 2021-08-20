@@ -13,6 +13,7 @@ typedef lval*(*lbuiltin)(lenv*, lval*);
 enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR, LVAL_FUN };
 
 struct lenv {
+    lenv* par;
     int count;
     char** syms;
     lval** vals;
@@ -38,6 +39,7 @@ typedef struct lval {
     struct lval** cell; 
 } lval;
 
+lval* lval_lambda(lval* formals, lval* body);
 lval* lval_join(lval* x, lval* y);
 lval* lval_eval_sexpr(lenv* e, lval* v);
 lval* lval_eval(lenv* e, lval* v);
@@ -58,6 +60,7 @@ lval* lval_eval(lenv* e, lval* v);
 lval* lenv_get(lenv* e, lval* k);
 
 lenv* lenv_new(void);
+lenv* lenv_copy(lenv* e);
 
 void lval_del(lval* v);
 void lval_print(lval* v);
@@ -65,10 +68,12 @@ void lval_println(lval* v);
 void lval_expr_print(lval* v, char open, char close);
 void lenv_del(lenv* e);
 void lenv_put(lenv* e, lval* k, lval* v);
+void lenv_def(lenv* e, lval* k, lval* v);
 
 char* ltype_name(int t);
 
 // Builtins
+lval* builtin_var(lenv* e, lval* a, char* func);
 lval* builtin(lenv* e, lval* a, char* func);
 lval* builtin_def(lenv* e, lval* a);
 lval* builtin_op(lenv* e, lval* a, char* op);
@@ -81,6 +86,7 @@ lval* builtin_tail(lenv* e, lval* a);
 lval* builtin_list(lenv* e, lval* a);
 lval* builtin_eval(lenv* e, lval* a);
 lval* builtin_join(lenv* e, lval* a);
+lval* builtin_lambda(lenv* e, lval* a);
 void lenv_add_builtin(lenv* e, char* name, lbuiltin func);
 void lenv_add_builtins(lenv* e);
 
