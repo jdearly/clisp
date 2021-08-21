@@ -58,6 +58,7 @@ lval* lval_take(lval* v, int i);
 lval* lval_copy(lval* v);
 lval* lval_eval(lenv* e, lval* v);
 lval* lenv_get(lenv* e, lval* k);
+lval* lval_call(lenv* e, lval* f, lval* a); 
 
 lenv* lenv_new(void);
 lenv* lenv_copy(lenv* e);

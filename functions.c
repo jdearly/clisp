@@ -98,19 +98,50 @@ lval* lval_call(lenv* e, lval* f, lval* a) {
     // if builtin then simply call that
     if (f->builtin) { return f->builtin(e, a); }
 
-    // assign each argument to each formal in order
-    for (int i = 0; i < a->count; i++) {
-        lenv_put(f->env, f->formals->cell[i], a->cell[i]);
+    // record argument counts
+    int given = a->count;
+    int total = f->formals->count;
+
+    // while arguments still remain to be processed
+    while (a->count) {
+
+        // if we've ran out of formal arguments to bind
+        if (f->formals->count == 0)  {
+            lval_del(a); return lval_err(
+                    "Function passed too many arguments. "
+                    "Got %i, Expected %i.", given, total);
+        }
+
+        // pop the first symbol from the formals
+        lval* sym = lval_pop(f->formals, 0);
+        
+        // pop the next argument from the list
+        lval* val = lval_pop(a, 0);
+
+        // bind a copy into the function's environment
+        lenv_put(f->env, sym, val);
+
+        // delete symbol and value
+        lval_del(sym); lval_del(val);
     }
 
+    // argument list is now bound so can be cleaned up
     lval_del(a);
 
-    // set the parent environment
-    f->env->par = e;
+    // if all formals have been bound evaluate
+    if (f->formals->count == 0) {
 
-    // evaluate the body
-    return builtin_eval(f->env,
-            lval_add(lval_sexpr(), lval_copy(f->body)));
+        // set environment parent to evaluation environment
+        f->env->par = e;
+
+        // evaluate and return
+        return builtin_eval(
+                f->env, lval_add(lval_sexpr(), lval_copy(f->body)));
+    } else {
+        // otherwise return patially evaluated function
+        return lval_copy(f);
+    }
+
 }
 
 // construct a pointer to a new number lval
@@ -390,7 +421,7 @@ lval* builtin_lambda(lenv* e, lval* a) {
 
     // check first q-expression contains only symbols
     for (int i = 0; i < a->cell[0]->count; i++) {
-        LASSERT(a, (a->cell[1]->type == LVAL_SYM),
+        LASSERT(a, (a->cell[0]->cell[i]->type == LVAL_SYM),
             "Cannot define non-symbol. Got %s, Expected %s.",
             ltype_name(a->cell[0]->cell[i]->type), ltype_name(LVAL_SYM));
     }
@@ -649,9 +680,9 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
         lval_del(f); lval_del(v);
         return err;
     }
-
+    
     // call builtin with operator
-    lval* result = f->builtin(e, v);
+    lval* result = lval_call(e, f, v);
     lval_del(f);
     return result;
 }
