@@ -93,6 +93,26 @@ lval* lval_fun(lbuiltin func) {
     return v;
 }
 
+lval* lval_call(lenv* e, lval* f, lval* a) {
+
+    // if builtin then simply call that
+    if (f->builtin) { return f->builtin(e, a); }
+
+    // assign each argument to each formal in order
+    for (int i = 0; i < a->count; i++) {
+        lenv_put(f->env, f->formals->cell[i], a->cell[i]);
+    }
+
+    lval_del(a);
+
+    // set the parent environment
+    f->env->par = e;
+
+    // evaluate the body
+    return builtin_eval(f->env,
+            lval_add(lval_sexpr(), lval_copy(f->body)));
+}
+
 // construct a pointer to a new number lval
 lval* lval_num(long x) {
     lval* v = malloc(sizeof(lval));
