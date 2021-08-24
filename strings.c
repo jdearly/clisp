@@ -93,6 +93,14 @@ lval* lval_fun(lbuiltin func) {
     return v;
 }
 
+lval* lval_str(char* s) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_STR;
+    v->str = malloc(strlen(s) + 1);
+    strcpy(v->str, s);
+    return v;
+}
+
 lval* lval_call(lenv* e, lval* f, lval* a) {
 
     // if builtin then simply call that
@@ -252,6 +260,8 @@ void lval_del(lval* v) {
             }
             break;
 
+        case LVAL_STR: free(v->str); break;
+
         // for err or sym free the string data
         case LVAL_ERR: free(v->err); break;
         case LVAL_SYM: free(v->sym); break;
@@ -310,6 +320,18 @@ void lval_expr_print(lval* v, char open, char close) {
     putchar(close);
 }
 
+void lval_print_str(lval* v) {
+    // make a copy of the string
+    char* escaped = malloc(strlen(v->str)+1);
+    strcpy(escaped, v->str);
+    // pass is through the escape function
+    escaped = mpcf_escape(escaped);
+    // print it between " characters
+    printf("\"%s\"", escaped);
+    // free the copied string
+    free(escaped);
+}
+
 void lval_print(lval* v) {
 
     switch (v->type) {
@@ -318,6 +340,7 @@ void lval_print(lval* v) {
         case LVAL_NUM: printf("%li", v->num); break;
         case LVAL_ERR: printf("Error: %s", v->err); break;
         case LVAL_SYM: printf("%s", v->sym); break;
+        case LVAL_STR: lval_print_str(v); break;
         case LVAL_FUN: 
             if (v->builtin) {
                 printf("<builtin>");
@@ -371,6 +394,9 @@ lval* lval_copy(lval* v) {
                 x->body = lval_copy(v->body);
             }
             break;
+        case LVAL_STR: x->str = malloc(strlen(v->str) + 1);
+                       strcpy(x->str, v->str); break;
+
         case LVAL_NUM: x->num = v->num; break;
 
         // copy stirngs using mallow and strcpy
@@ -405,6 +431,7 @@ char* ltype_name(int t) {
     case LVAL_SYM: return "Symbol";
     case LVAL_SEXPR: return "S-Expression";
     case LVAL_QEXPR: return "Q-Expression";
+    case LVAL_STR: return "String";
     default: return "Unknown";
   }
 }
@@ -673,6 +700,8 @@ int lval_eq(lval* x, lval* y) {
         case LVAL_ERR: return (strcmp(x->err, y->err) == 0);
         case LVAL_SYM: return (strcmp(x->sym, y->sym) == 0);
 
+        case LVAL_STR: return (strcmp(x->str, y->str) == 0);
+
         // if bultin compare, otherwise compare formals and body
         case LVAL_FUN:
             if (x->builtin || y->builtin) {
@@ -914,7 +943,8 @@ int main(int argc, char** argv) {
     mpca_lang(MPCA_LANG_DEFAULT,
           "                                                     \
             number   : /-?[0-9]+/ ;                             \
-            symbol    : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/ ;      \
+            string   : /\"(\\\\.|[^\"])*\"/;                    \
+            symbol   : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/ ;       \
             sexpr    : '(' <expr>* ')' ;                        \
             qexpr    : '{' <expr>* '}' ;                        \
             expr     : <number> | <symbol> | <sexpr> | <qexpr>; \

@@ -10,7 +10,8 @@ typedef struct lenv lenv;
 
 typedef lval*(*lbuiltin)(lenv*, lval*);
 
-enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR, LVAL_FUN };
+enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR, LVAL_FUN, LVAL_STR
+};
 
 struct lenv {
     lenv* par;
@@ -27,6 +28,7 @@ typedef struct lval {
     long num;
     char* err;
     char* sym;
+    char* str;
 
     // function
     lbuiltin builtin;
@@ -59,12 +61,14 @@ lval* lval_copy(lval* v);
 lval* lval_eval(lenv* e, lval* v);
 lval* lenv_get(lenv* e, lval* k);
 lval* lval_call(lenv* e, lval* f, lval* a); 
+lval* lval_str(char* s);
 
 lenv* lenv_new(void);
 lenv* lenv_copy(lenv* e);
 
 void lval_del(lval* v);
 void lval_print(lval* v);
+void lval_print_str(lval* v); 
 void lval_println(lval* v);
 void lval_expr_print(lval* v, char open, char close);
 void lenv_del(lenv* e);
