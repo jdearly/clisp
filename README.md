@@ -36,13 +36,13 @@ clispy> load "hello.lspy"
 - [x] Variables
 - [x] Conditionals
 - [x] Strings
-- [ ] Standard library
+- [ ] Builtin standard library
 
-# Future Features
+# Additional Features
 - [ ] Native types
 - [ ] User defined types
 - [ ] List literals
-- [ ] OS interation
+- [ ] OS interaction
 - [ ] Macros
 - [ ] Variable hashtable
 - [ ] Pool allocation
