@@ -29,5 +29,5 @@ lispy> load "hello.lspy"
 ```
 # Credits
 
-* [Build Your Own Lisp](http://www.buildyourownlisp.com/);
-* [MPC](https://github.com/orangeduck/mpc);
+* [Build Your Own Lisp](http://www.buildyourownlisp.com/)
+* [MPC](https://github.com/orangeduck/mpc)
