@@ -1,11 +1,14 @@
 A basic Lisp implementation written in C. WIP.
 
 # Usage 
+
+Requires package libedit-dev
+
 ```
-cc --std=c99 -Wall -g functions.c mpc.c -ledit -lm -o lispy 
+cc --std=c99 -Wall -g lispy.c mpc.c -ledit -lm -o lispy 
 ```
 ```
-./variables
+./lispy
 ```
 # Examples
 ```
@@ -17,8 +20,14 @@ lispy> eval (head {+ - + - * /})
 <function>
 lispy> (eval (head {+ - + - * /})) 10 20
 30
-lispy> hello
-Error: unbound symbol!
-lispy>
+lispy> print "hello world!"
+"hello world!"
+()
+lispy> load "hello.lspy"
+"Hello, World!"
+()
 ```
+# Credits
 
+* Build Your Own Lisp [Book](https://www.amazon.com/Build-Your-Own-Lisp-Programming/dp/1501006622) and [Website](http://www.buildyourownlisp.com/);
+* MPC library [Github Page](https://github.com/orangeduck/mpc);
