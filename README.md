@@ -29,5 +29,5 @@ lispy> load "hello.lspy"
 ```
 # Credits
 
-* Build Your Own Lisp [Book](https://www.amazon.com/Build-Your-Own-Lisp-Programming/dp/1501006622) and [Website](http://www.buildyourownlisp.com/);
-* MPC library [Github Page](https://github.com/orangeduck/mpc);
+* [Build Your Own Lisp](http://www.buildyourownlisp.com/);
+* [MPC](https://github.com/orangeduck/mpc);
