@@ -210,20 +210,20 @@ lval* lval_err(char* fmt, ...) {
   lval* v = malloc(sizeof(lval));
   v->type = LVAL_ERR;
 
-  /* Create a va list and initialize it */
+  // create a va list and initialize it
   va_list va;
   va_start(va, fmt);
 
-  /* Allocate 512 bytes of space */
+  // allocate 512 bytes of space
   v->err = malloc(512);
 
-  /* printf the error string with a maximum of 511 characters */
+  // printf the error string with a maximum of 511 characters
   vsnprintf(v->err, 511, fmt, va);
 
-  /* Reallocate to number of bytes actually used */
+  // Reallocate to number of bytes actually used
   v->err = realloc(v->err, strlen(v->err)+1);
 
-  /* Cleanup our va list */
+  // Cleanup our va list
   va_end(va);
 
   return v;
@@ -1066,12 +1066,12 @@ int main(int argc, char** argv) {
     if (argc == 1) {
 
         // Version and Exit information 
-        puts("clisp Version 0");
+        puts("clispy Version 0.1");
         puts("Press Ctrl+c to Exit\n");
         // infinite loop
         while(1) {
             // the prompt
-            char* input = readline("clisp> "); 
+            char* input = readline("clispy> "); 
 
             // Add input to history
             add_history(input);

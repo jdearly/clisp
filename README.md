@@ -5,28 +5,53 @@ A basic Lisp implementation written in C. WIP.
 Requires package libedit-dev
 
 ```
-cc --std=c99 -Wall -g lispy.c mpc.c -ledit -lm -o lispy 
+cc --std=c99 -Wall -g clispy.c mpc.c -ledit -lm -o clispy 
 ```
 ```
-./lispy
+./clispy
 ```
 # Examples
 ```
-lispy> +
+clispy> +
 <function>
-lispy> eval (head {5 10 11 15})
+clispy> eval (head {5 10 11 15})
 5
-lispy> eval (head {+ - + - * /})
+clispy> eval (head {+ - + - * /})
 <function>
-lispy> (eval (head {+ - + - * /})) 10 20
+clispy> (eval (head {+ - + - * /})) 10 20
 30
-lispy> print "hello world!"
+clispy> print "hello world!"
 "hello world!"
 ()
-lispy> load "hello.lspy"
+clispy> load "hello.lspy"
 "Hello, World!"
 ()
 ```
+
+# Basic Features
+- [x] Error handling
+- [x] S-Expressions
+- [x] Q-Expressions
+- [x] Functions
+- [x] Variables
+- [x] Conditionals
+- [x] Strings
+- [ ] Standard library
+
+# Future Features
+- [ ] Native types
+- [ ] User defined types
+- [ ] List literals
+- [ ] OS interation
+- [ ] Macros
+- [ ] Variable hashtable
+- [ ] Pool allocation
+- [ ] Garbage collection
+- [ ] Tail call optimization
+- [ ] Lexical scoping
+- [ ] Static typing
+- [ ] Builtin parser (remove MPC)
+
 # Credits
 
 * [Build Your Own Lisp](http://www.buildyourownlisp.com/)
