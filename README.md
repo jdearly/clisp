@@ -2,13 +2,13 @@ A basic Lisp implementation written in C. WIP.
 
 # Usage 
 
-Requires package libedit-dev
+Requires package `libedit-dev`
 
 ```
-cc --std=c99 -Wall -g clispy.c mpc.c -ledit -lm -o clispy 
+cc --std=c99 -Wall -g lispy.c mpc.c -ledit -lm -o lispy 
 ```
 ```
-./clispy
+./lispy
 ```
 # Examples
 ```
